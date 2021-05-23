@@ -17,13 +17,13 @@ wait_time = 1
 
 def get_images(search_name):
 #保存フォルダの指定
-    savedir = "./src/images"
+    savedir = "./src/images" + search_name
     json_file = "./src/imageList.json"
 
     flickr = FlickrAPI(key, secret, format='parsed-json')
     result = flickr.photos.search(
         text = search_name,
-        per_page = 20,
+        per_page = 400,
         media = 'photos',
         sort = 'relevance',
         safe_search = 1,
