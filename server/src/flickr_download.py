@@ -15,15 +15,14 @@ secret = os.getenv('FLICKR_SECRET_KEY')
 wait_time = 1
 
 
-def get_images(serch_name):
+def get_images(search_name):
 #保存フォルダの指定
-    serch_name = serch_name
     savedir = "./src/images"
     json_file = "./src/imageList.json"
 
     flickr = FlickrAPI(key, secret, format='parsed-json')
     result = flickr.photos.search(
-        text = serch_name,
+        text = search_name,
         per_page = 20,
         media = 'photos',
         sort = 'relevance',
