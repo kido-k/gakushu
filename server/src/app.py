@@ -8,7 +8,7 @@ def hello():
     return "Hello world!!"
 
 @app.route('/get_images')
-def flickr_download():
+def get_images():
     search_name = request.args.get('search_name')
     flickr_download.get_images(search_name)
     return "OK"

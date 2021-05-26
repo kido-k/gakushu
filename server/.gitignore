@@ -1,3 +1,4 @@
-imageList.json
 images
 .env
+firebase-adminsdk.json
+__pycache__
