@@ -1,4 +1,21 @@
+require('dotenv').config()
+
+const {
+  API_KEY,
+  AUTH_DOMAIN,
+  DATABASE_URL,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGEING_SEND_ID,
+  APP_ID,
+  MEASUREMENT_ID,
+} = process.env
+
 export default {
+  publicRuntimeConfig: {
+    apiKey: process.env.API_KEY,
+    authDomain: process.env.AUTH_DOMAIN,
+  },
   // Global page headers: https://go.nuxtjs.dev/config-head
   srcDir: 'src/',
   head: {
@@ -15,7 +32,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/get-api'],
+  plugins: ['@/plugins/get-api', '@/plugins/firebase'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -38,6 +55,7 @@ export default {
     '@nuxtjs/pwa',
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
+    '@nuxtjs/dotenv',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -60,4 +78,14 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+  env: {
+    API_KEY,
+    AUTH_DOMAIN,
+    DATABASE_URL,
+    PROJECT_ID,
+    STORAGE_BUCKET,
+    MESSAGEING_SEND_ID,
+    APP_ID,
+    MEASUREMENT_ID,
+  },
 }
