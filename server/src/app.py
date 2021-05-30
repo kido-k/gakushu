@@ -10,7 +10,8 @@ def hello():
 @app.route('/get_images')
 def get_images():
     search_name = request.args.get('search_name')
-    flickr_download.get_images(search_name)
+    max_get_number = request.args.get('max_get_number')
+    flickr_download.get_images(search_name, max_get_number)
     return "OK"
 
 if __name__ == '__main__':

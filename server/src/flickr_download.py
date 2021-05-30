@@ -28,7 +28,13 @@ firebase_admin.initialize_app(credential, {
 })
 bucket = storage.bucket()
 
-def get_images(search_name):
+def get_images(search_name, max_get_number):
+    # firebaseのステータスを処理中に変更
+    results_ref = db.reference('/results/images/')
+    results_ref.child(search_name).set({
+        'getImage': 'progress'
+    })
+
     #保存フォルダの指定
     savedir = "./src/images"
 
@@ -47,9 +53,11 @@ def get_images(search_name):
     for i, photo in enumerate(photos['photo']):
         # 画像が取得済みかどうかチェックし、なければfirebaseに登録
         image_data = images_ref.get()
-        if image_data.get(photo['id']) != None: continue
+        if image_data != None and image_data.get(photo['id']) != None: continue
+        storage_path = search_name + '/' + photo['id'] + '.jpg'
         images_ref.child(photo['id']).set({
-            'path': photo['id'] + '.jpg',
+            'path': 'https://firebasestorage.googleapis.com/v0/b/' + firebase_bucket + '/o/' + urllib.parse.quote(storage_path, safe='') + '?alt=media',
+            'learn_image': True
         })
 
         # flickrからデータをダウンロード
@@ -61,7 +69,6 @@ def get_images(search_name):
 
         # firebase storageにアップロード
         content_type = 'image/jpg'
-        storage_path = search_name + '/' + photo['id'] + '.jpg'
         blob = bucket.blob(storage_path)
         with open(filepath, 'rb') as f:
             blob.upload_from_file(f, content_type=content_type)
@@ -70,3 +77,7 @@ def get_images(search_name):
     # localに落とした画像ファイルを削除
     shutil.rmtree(savedir)
     os.mkdir(savedir)
+    results_ref.child(search_name).set({
+        'getImage': 'finish'
+    })
+
