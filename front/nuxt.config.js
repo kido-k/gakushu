@@ -6,7 +6,7 @@ const {
   DATABASE_URL,
   PROJECT_ID,
   STORAGE_BUCKET,
-  MESSAGEING_SEND_ID,
+  MESSAGING_SEND_ID,
   APP_ID,
   MEASUREMENT_ID,
 } = process.env
@@ -84,7 +84,7 @@ export default {
     DATABASE_URL,
     PROJECT_ID,
     STORAGE_BUCKET,
-    MESSAGEING_SEND_ID,
+    MESSAGING_SEND_ID,
     APP_ID,
     MEASUREMENT_ID,
   },
