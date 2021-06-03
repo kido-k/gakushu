@@ -1,6 +1,7 @@
 from flask import Flask, request
 import flickr_download
-import gen_data
+import create_learning_data
+import learning_cnn
 
 app = Flask(__name__)
 
@@ -17,7 +18,10 @@ def get_images():
 
 @app.route('/learning')
 def learning():
-    gen_data.create_numpy_data('dog-cat-bird', ['dog', 'cat', 'bird'])
+    file_name = 'dog-cat-bird'
+    classes = ['dog', 'cat', 'bird']
+    create_learning_data.main(file_name, classes)
+    learning_cnn.main(file_name, classes)
     return "OK"
 
 if __name__ == '__main__':

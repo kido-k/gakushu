@@ -5,7 +5,7 @@ from sklearn import model_selection
 
 IMAGE_SIZE = 50
 
-def create_numpy_data(category, classes):
+def main(category, classes):
     X = []
     Y = []
     for index, classlabel in enumerate(classes):
