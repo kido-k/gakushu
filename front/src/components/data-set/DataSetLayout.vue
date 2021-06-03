@@ -45,7 +45,7 @@
           class="image__search__button text-button"
           outlined
           large
-          :disabled="!searchName"
+          :disabled="!searchName || progress"
           @click="getImage"
         >
           GET
@@ -94,6 +94,7 @@ export default {
       searchList: [],
       selectResult: null,
       resultRef: null,
+      progress: false,
     }
   },
   computed: {
@@ -129,13 +130,23 @@ export default {
         getImageNumber: 0,
       })
       this.deleteImageList()
-      const getImageUrl =
-        'http://localhost:5000/get_images' +
-          '?search_name=' +
-          this.searchName +
-          '&max_get_number=' +
-          this.maxGetNumber || 50
-      this.$getApi(getImageUrl)
+      const getImageUrl = 'http://localhost:5000/get_images'
+      this.progress = true
+      this.$postApi(
+        getImageUrl,
+        (_) => {
+          this.progress = false
+          this.updateImageList()
+        },
+        (error) => {
+          this.progress = false
+          throw error
+        },
+        {
+          search_name: this.searchName,
+          max_get_number: this.maxGetNumber || 50,
+        }
+      )
       this.searchName = ''
       this.maxGetNumber = 50
     },

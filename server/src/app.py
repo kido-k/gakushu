@@ -13,10 +13,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 def hello():
     return "Hello world!!"
 
-@app.route('/get_images')
+@app.route('/get_images', methods=['POST'])
 def get_images():
-    search_name = request.args.get('search_name')
-    max_get_number = request.args.get('max_get_number')
+    post_data = request.json
+    search_name = post_data['search_name']
+    max_get_number = post_data['max_get_number']
     flickr_download.get_images(search_name, max_get_number)
     return "OK"
 
