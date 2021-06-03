@@ -1,6 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db, storage
+from firebase_admin import credentials, db, storage
 
 from dotenv import load_dotenv
 from flickrapi import FlickrAPI

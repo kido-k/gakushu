@@ -1,12 +1,15 @@
 from flask import Flask, request
+from flask_cors import CORS, cross_origin
 import flickr_download
 import create_learning_data
 import learning_cnn
 import predict
 
 app = Flask(__name__)
+app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def hello():
     return "Hello world!!"
 
@@ -17,10 +20,12 @@ def get_images():
     flickr_download.get_images(search_name, max_get_number)
     return "OK"
 
-@app.route('/learning')
+@app.route('/learning', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def learning():
-    file_name = 'dog-cat-bird'
-    classes = ['dog', 'cat', 'bird']
+    post_data = request.json
+    file_name = post_data['file_name']
+    classes = post_data['classes']
     create_learning_data.main(file_name, classes)
     learning_cnn.main(file_name, classes)
     return "OK"
@@ -34,4 +39,4 @@ def predict_image():
     return result
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)

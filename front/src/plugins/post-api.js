@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export default (_, inject) => {
-  inject('getApi', async (url, callback, errorCallBack) => {
+  inject('postApi', async (url, callback, errorCallBack, postData) => {
     const option = {
       headers: {
         Accept: 'application/json',
@@ -10,11 +10,11 @@ export default (_, inject) => {
     }
 
     await axios
-      .get(url, option)
+      .post(url, postData, option)
       .then((response) => {
         console.log('<<<<<<<<<< response!!!' + url)
         console.log(response.data)
-        callback()
+        callback(response.data)
       })
       .catch((error) => {
         console.log('<<<<<<<<<< error!!!' + url)

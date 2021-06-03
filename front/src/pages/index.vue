@@ -8,18 +8,23 @@
         {{ item }}
       </v-tab>
     </v-tabs>
-    <v-card v-if="tab === 0" class="mt-10">
+    <v-card v-if="tab === 0" flat class="mt-10">
       <data-set-layout />
+    </v-card>
+    <v-card v-else-if="tab === 1" flat class="mt-10">
+      <learning-layout />
     </v-card>
   </section>
 </template>
 
 <script>
 import DataSetLayout from '@/components/data-set/DataSetLayout.vue'
+import LearningLayout from '@/components/learning/LearningLayout.vue'
 
 export default {
   components: {
     DataSetLayout,
+    LearningLayout,
   },
   data() {
     return {
@@ -32,7 +37,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .wrap {
   max-width: 900px;
   margin: auto;

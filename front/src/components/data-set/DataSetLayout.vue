@@ -155,7 +155,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .image {
   &__title {
     font-size: 48px;
