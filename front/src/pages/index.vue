@@ -8,23 +8,28 @@
         {{ item }}
       </v-tab>
     </v-tabs>
-    <v-card v-if="tab === 0" flat class="mt-10">
+    <div v-if="tab === 0" class="mt-10">
       <data-set-layout />
-    </v-card>
-    <v-card v-else-if="tab === 1" flat class="mt-10">
+    </div>
+    <div v-else-if="tab === 1" class="mt-10">
       <learning-layout />
-    </v-card>
+    </div>
+    <div v-else-if="tab === 2" class="mt-10">
+      <predict-layout />
+    </div>
   </section>
 </template>
 
 <script>
 import DataSetLayout from '@/components/data-set/DataSetLayout.vue'
 import LearningLayout from '@/components/learning/LearningLayout.vue'
+import PredictLayout from '@/components/predict/PredictLayout.vue'
 
 export default {
   components: {
     DataSetLayout,
     LearningLayout,
+    PredictLayout,
   },
   data() {
     return {
@@ -40,7 +45,7 @@ export default {
   },
   mounted() {
     if (sessionStorage.getItem('gakushuTab')) {
-      this.tab = sessionStorage.getItem('gakushuTab')
+      this.tab = Number(sessionStorage.getItem('gakushuTab'))
     }
   },
   methods: {},

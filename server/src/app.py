@@ -31,12 +31,13 @@ def learning():
     learning_cnn.main(file_name, classes)
     return "OK"
 
-@app.route('/predict')
+@app.route('/predict', methods=['POST'])
 def predict_image():
-    predict_image_file = './src/sample/bird.jpg'
-    file_name = 'dog-cat-bird'
-    classes = ['dog', 'cat', 'bird']
-    result = predict.main(predict_image_file, file_name, classes)
+    post_data = request.json
+    predict_image_file = post_data['predict_image_file']
+    model_name = post_data['model_name']
+    classes = post_data['classes']
+    result = predict.main(predict_image_file, model_name, classes)
     return result
 
 if __name__ == '__main__':
