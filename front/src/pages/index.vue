@@ -33,6 +33,16 @@ export default {
     }
   },
   computed: {},
+  watch: {
+    tab() {
+      sessionStorage.setItem('gakushuTab', this.tab)
+    },
+  },
+  mounted() {
+    if (sessionStorage.getItem('gakushuTab')) {
+      this.tab = sessionStorage.getItem('gakushuTab')
+    }
+  },
   methods: {},
 }
 </script>

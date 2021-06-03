@@ -6,7 +6,6 @@ export default (_, inject) => {
       headers: {
         Accept: 'application/json',
       },
-      timeout: 30000,
     }
 
     await axios
