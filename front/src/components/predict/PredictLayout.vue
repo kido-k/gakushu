@@ -14,12 +14,12 @@
 
     <template v-if="selectModel">
       <h2>予測する画像</h2>
-      <div class="setting-group">
+      <v-layout class="setting-group" align-center justify-center>
         <v-hover>
           <template #default="{ hover }">
             <v-card flat class="predict__image">
               <div v-if="base64Image">
-                <v-img :src="base64Image" :aspect-ratio="16 / 9" />
+                <v-img :src="base64Image" :aspect-ratio="1" />
               </div>
               <div v-else class="no-image">
                 <p class="no-image__text">NO IMAGE</p>
@@ -27,12 +27,34 @@
               <v-fade-transition>
                 <v-overlay v-if="hover" :absolute="true">
                   <v-btn large @click="selectImage"> SELECT IMAGE </v-btn>
+                  <v-btn
+                    v-if="base64Image"
+                    fab
+                    color="#808080"
+                    small
+                    class="ml-2"
+                    @click="deletImage"
+                  >
+                    <v-icon color="#fff">mdi-minus</v-icon>
+                  </v-btn>
                 </v-overlay>
               </v-fade-transition>
             </v-card>
           </template>
         </v-hover>
-      </div>
+        <div v-if="predictResult" class="predict__result">
+          <p class="predict__result__text">{{ predictResult }}</p>
+          <v-layout v-if="predict" justify-center>
+            <chart
+              :labels="chartLabels"
+              :data="chartData"
+              :options="chartOptions"
+              :colors="chartColors"
+              :styles="{ height: '350px', width: '350px' }"
+            />
+          </v-layout>
+        </div>
+      </v-layout>
 
       <input
         ref="inputImage"
@@ -42,7 +64,7 @@
         @change="selectedFile()"
       />
       <v-btn
-        :disabled="!imageFile || !selectModel"
+        :disabled="!base64Image || !selectModel"
         large
         outlined
         class="predict__button"
@@ -50,36 +72,47 @@
       >
         PREDICT
       </v-btn>
-      <div v-if="predictResult" class="setting-group mb-10">
-        <p class="predict__result">{{ predictResult }}</p>
-        <v-layout v-if="predict" justify-center>
-          <div v-for="(key, index) in Object.keys(predict)" :key="index">
-            <span
-              v-if="key !== 'result' && key !== 'imageUrl'"
-              class="predict__result__detail"
-            >
-              {{ key }}: {{ predict[key] }}%
-            </span>
-          </div>
-        </v-layout>
-      </div>
     </template>
   </section>
 </template>
 
 <script>
+import Chart from '@/components/common/Chart.vue'
+
 export default {
+  components: {
+    Chart,
+  },
   data() {
     return {
       selectModel: null,
       modelData: null,
       selectModelList: [],
-      imageFile: null,
       base64Image: null,
       progress: false,
       overlay: false,
       learningRef: null,
       predictResult: null,
+      chartData: [],
+      chartLabels: [],
+      chartColors: [],
+      chartOptions: {
+        maintainAspectRatio: false,
+        animation: {
+          duration: 1500,
+          easing: 'easeInOutCubic',
+        },
+      },
+      baseChartColor: [
+        'blue',
+        'green',
+        'red',
+        'yellow',
+        'pink',
+        'skyblue',
+        'gray',
+        'purple',
+      ],
     }
   },
   computed: {
@@ -90,7 +123,6 @@ export default {
         learningData = snapshot.val()
       })
       learningData = learningData ? learningData.predict : {}
-      if (learningData) this.updatePredictResult(learningData)
       return learningData
     },
   },
@@ -100,6 +132,7 @@ export default {
         this.learningRef = this.$firebase
           .database()
           .ref('results/learning/' + this.selectModel)
+        if (this.predict) this.updatePredictResult()
       }
     },
   },
@@ -110,10 +143,15 @@ export default {
     selectImage() {
       this.$refs.inputImage.click()
     },
+    deletImage() {
+      this.base64Image = null
+      this.predictResult = null
+      this.learningRef.child('predict').set({})
+    },
     async selectedFile() {
       this.progress = true
-      this.imageFile = this.$refs.inputImage.files[0]
-      this.base64Image = await this.getBase64(this.imageFile)
+      const imageFile = this.$refs.inputImage.files[0]
+      this.base64Image = await this.getBase64(imageFile)
     },
     getBase64(file) {
       return new Promise((resolve, reject) => {
@@ -138,6 +176,7 @@ export default {
         predictUrl,
         (response) => {
           this.predictResult = response
+          if (this.predict) this.updatePredictResult()
         },
         (error) => {
           throw error
@@ -149,9 +188,19 @@ export default {
         }
       )
     },
-    updatePredictResult(learningData) {
-      this.base64Image = learningData.imageUrl
-      this.predictResult = learningData.result
+    updatePredictResult() {
+      this.base64Image = this.predict.imageUrl
+      this.predictResult = this.predict.result
+      const predictDetail = this.predict.predictDetail
+
+      if (predictDetail) {
+        this.chartLabels = Object.keys(predictDetail) || []
+        this.chartData = []
+        Object.keys(predictDetail).forEach((key) => {
+          this.chartData.push(predictDetail[key])
+        })
+        this.chartColors = this.baseChartColor.slice(0, this.chartLabels.length)
+      }
     },
   },
 }
@@ -166,8 +215,12 @@ export default {
       margin: auto;
     }
   }
+  &__main {
+    width: 350px;
+    margin: auto;
+  }
   &__image {
-    width: 500px;
+    width: 350px;
     margin: auto;
   }
   &__button {
@@ -175,8 +228,11 @@ export default {
     padding: 30px !important;
   }
   &__result {
-    font-size: 24px;
-    font-weight: bold;
+    width: 350px;
+    &__text {
+      font-size: 24px;
+      font-weight: bold;
+    }
     &__detail {
       font-size: 14px;
       margin: 0 10px 0 0;
@@ -185,13 +241,13 @@ export default {
 }
 
 .no-image {
-  width: 500px;
-  height: 281px;
+  width: 350px;
+  height: 350px;
   background-color: rgba(0, 0, 0, 0.1);
   margin: auto;
   &__text {
-    padding-top: 120px;
-    font-size: 24px;
+    padding-top: 140px;
+    font-size: 20px;
   }
 }
 

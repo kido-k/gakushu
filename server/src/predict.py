@@ -61,14 +61,15 @@ def main(predict_image_file, file_name, classes):
     predicted = result.argmax()
     percentage = my_round_int(result[predicted] * 100)
 
-    results_ref = db.reference('/results/learning/' + file_name + '/')
+    predict_result = {}
     for i, classlabel in enumerate(classes):
-        results_ref.child('predict').update({
-            classlabel: my_round_int(result[i] * 100)
-        })
+        predict_result[classlabel] = my_round_int(result[i] * 100)
+
+    results_ref = db.reference('/results/learning/' + file_name + '/')
     results_ref.child('predict').update({
         'imageUrl': predict_image_file,
-        'result': "{0} ({1} %)".format(classes[predicted], percentage)
+        'result': "{0} ({1} %)".format(classes[predicted], percentage),
+        'predictDetail': predict_result
     })
     return "{0} ({1} %)".format(classes[predicted], percentage)
 
