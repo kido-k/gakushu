@@ -74,7 +74,7 @@ export default {
       this.updateImages()
     },
     postCreateModel() {
-      const learningUrl = 'http://localhost:5000/learning'
+      const learningUrl = 'http://localhost:5000/create_learning_model'
       this.$postApi(
         learningUrl,
         (_) => {

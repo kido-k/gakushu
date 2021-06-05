@@ -1,11 +1,11 @@
 from PIL import Image
-import os, glob
+import os, glob, shutil
 import numpy as np
 from sklearn import model_selection
 
 IMAGE_SIZE = 50
 
-def main(category, classes):
+def create_npy_data(model_name, classes):
     X = []
     Y = []
     for index, classlabel in enumerate(classes):
@@ -25,6 +25,9 @@ def main(category, classes):
 
     X_train, X_test, y_train, y_test = model_selection.train_test_split(X, Y)
     xy = (X_train, X_test, y_train, y_test )
-    np.save('./src/npy/' + category + '.npy', xy)
+    np.save('./src/npy/' + model_name + '.npy', xy)
 
-
+def delete_npy_data(model_name):
+    delete_dir = './src/npy/' + model_name
+    if os.path.exists(delete_dir):
+        shutil.rmtree(delete_dir)

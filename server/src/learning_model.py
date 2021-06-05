@@ -8,7 +8,7 @@ from firebase_admin import credentials, db, storage
 
 import tensorflow as tf
 import numpy as np
-import os
+import os, shutil
 
 image_size = 50
 
@@ -72,6 +72,11 @@ def model_eval(model, X, y):
     scores = model.evaluate(X, y, verbose=1)
     print('Test Loss: ', scores[0])
     print('Test Accuracy: ', scores[1])
+
+def delete_learning_model(model_name):
+    delete_dir = './src/model/' + model_name
+    if os.path.exists(delete_dir):
+        shutil.rmtree(delete_dir)
 
 if __name__ == '__main__':
     main()

@@ -6,8 +6,8 @@ import firebase_admin
 from firebase_admin import credentials, db, storage
 
 import training_data
-import create_learning_data
-import learning_cnn
+import learning_numpy_data
+import learning_model
 import predict
 
 app = Flask(__name__)
@@ -45,14 +45,23 @@ def delete_images():
     training_data.delete_images(image_name)
     return "OK"
 
-@app.route('/learning', methods=['POST'])
+@app.route('/create_learning_model', methods=['POST'])
 @cross_origin(supports_credentials=True)
-def learning():
+def create_learning_model():
     post_data = request.json
     file_name = post_data['file_name']
     classes = post_data['classes']
-    create_learning_data.main(file_name, classes)
-    learning_cnn.main(file_name, classes)
+    learning_numpy_data.create_npy_data(file_name, classes)
+    learning_model.main(file_name, classes)
+    return "OK"
+
+@app.route('/delete_learning_model', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def delete_learning_model():
+    post_data = request.json
+    model_name = post_data['model_name']
+    learning_numpy_data.delete_npy_data(model_name)
+    learning_model.delete_learning_model(model_name)
     return "OK"
 
 @app.route('/predict', methods=['POST'])

@@ -18,6 +18,7 @@
               <th class="text-left">モデル名</th>
               <th class="text-left">ステータス</th>
               <th class="text-left">学習データ</th>
+              <th class="text-left">削除</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +37,9 @@
                   <span v-if="learnIndex !== 0">,</span>
                   {{ category }}
                 </span>
+              </td>
+              <td>
+                <v-icon @click="deleteLearningModel(key)">mdi-delete</v-icon>
               </td>
             </tr>
           </tbody>
@@ -76,7 +80,28 @@ export default {
   mounted() {
     this.resultRef = this.$firebase.database().ref('results/learning')
   },
-  methods: {},
+  methods: {
+    deleteLearningModel(modelName) {
+      const deleteLearningModelUrl =
+        'http://localhost:5000/delete_learning_model'
+      this.progress = true
+      this.$postApi(
+        deleteLearningModelUrl,
+        (_) => {
+          this.progress = false
+          const deleteResultRef = 'results/learning/' + modelName
+          this.$firebase.database().ref(deleteResultRef).remove()
+        },
+        (error) => {
+          this.progress = false
+          throw error
+        },
+        {
+          model_name: modelName,
+        }
+      )
+    },
+  },
 }
 </script>
 
