@@ -93,7 +93,7 @@ export default {
   data() {
     return {
       searchName: '',
-      maxGetNumber: 50,
+      maxGetNumber: 100,
       imageData: {},
       searchList: [],
       selectResult: null,
@@ -130,7 +130,7 @@ export default {
     getImage() {
       this.resultRef.child(this.searchName).set({
         getImageStatus: 'start',
-        maxGetNumber: this.maxGetNumber || 50,
+        maxGetNumber: this.maxGetNumber || 100,
         getImageNumber: 0,
       })
       this.clearImageStatus()
@@ -148,11 +148,11 @@ export default {
         },
         {
           search_name: this.searchName,
-          max_get_number: this.maxGetNumber || 50,
+          max_get_number: this.maxGetNumber || 100,
         }
       )
       this.searchName = ''
-      this.maxGetNumber = 50
+      this.maxGetNumber = 100
     },
     updateImageList() {
       this.$firebase
