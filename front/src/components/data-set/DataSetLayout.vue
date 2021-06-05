@@ -10,6 +10,7 @@
                 <th class="text-left">ステータス</th>
                 <th class="text-left">最大取得件数</th>
                 <th class="text-left">取得件数</th>
+                <th class="text-left">削除</th>
               </tr>
             </thead>
             <tbody>
@@ -21,6 +22,9 @@
                 <td>{{ resultStatus[key].getImageStatus }}</td>
                 <td>{{ resultStatus[key].maxGetNumber }}</td>
                 <td>{{ resultStatus[key].getImageNumber }}</td>
+                <td>
+                  <v-icon @click="deleteImageData(key)">mdi-delete</v-icon>
+                </td>
               </tr>
             </tbody>
           </template>
@@ -129,7 +133,7 @@ export default {
         maxGetNumber: this.maxGetNumber || 50,
         getImageNumber: 0,
       })
-      this.deleteImageList()
+      this.clearImageStatus()
       const getImageUrl = 'http://localhost:5000/get_images'
       this.progress = true
       this.$postApi(
@@ -159,8 +163,30 @@ export default {
           this.searchList = Object.keys(this.imageData)
         })
     },
-    deleteImageList() {
+    clearImageStatus() {
       this.$firebase.database().ref('images').child(this.searchName).set({})
+    },
+    deleteImageData(imageName) {
+      const deleteImageUrl = 'http://localhost:5000/delete_images'
+      this.progress = true
+      this.$postApi(
+        deleteImageUrl,
+        (_) => {
+          this.progress = false
+          const deleteImageRef = 'images/' + imageName
+          this.$firebase.database().ref(deleteImageRef).remove()
+          const deleteResultRef = 'results/images/' + imageName
+          this.$firebase.database().ref(deleteResultRef).remove()
+          this.updateImageList()
+        },
+        (error) => {
+          this.progress = false
+          throw error
+        },
+        {
+          image_name: imageName,
+        }
+      )
     },
   },
 }

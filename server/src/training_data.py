@@ -15,18 +15,7 @@ key = os.getenv('FLICKR_API_KEY')
 secret = os.getenv('FLICKR_SECRET_KEY')
 wait_time = 1
 
-# firebaseの設定
-credential = credentials.Certificate("./src/firebase-adminsdk.json")
-firebase_database_url = os.getenv('FIREBASE_DATABASE_URL')
-firebase_bucket = os.getenv('FIREBASE_BUCKET')
-firebase_admin.initialize_app(credential, {
-    'databaseURL': firebase_database_url,
-    'databaseAuthVariableOverride': {
-        'uid': 'my-service-worker'
-    },
-    'storageBucket': firebase_bucket
-})
-bucket = storage.bucket()
+# bucket = storage.bucket()
 
 def get_images(search_name, max_get_number):
     # firebaseのステータスを処理中に変更
@@ -93,3 +82,8 @@ def get_images(search_name, max_get_number):
         'getImageNumber': len(photos['photo'])
     })
 
+
+def delete_images(image_name):
+    delete_dir = "./src/images/" + image_name    
+    if os.path.exists(delete_dir):
+        shutil.rmtree(delete_dir)

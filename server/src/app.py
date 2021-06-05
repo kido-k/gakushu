@@ -1,6 +1,11 @@
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
-import flickr_download
+import os
+
+import firebase_admin
+from firebase_admin import credentials, db, storage
+
+import training_data
 import create_learning_data
 import learning_cnn
 import predict
@@ -8,6 +13,18 @@ import predict
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+# firebaseの初期設定
+credential = credentials.Certificate("./src/firebase-adminsdk.json")
+firebase_database_url = os.getenv('FIREBASE_DATABASE_URL')
+firebase_bucket = os.getenv('FIREBASE_BUCKET')
+firebase_admin.initialize_app(credential, {
+    'databaseURL': firebase_database_url,
+    'databaseAuthVariableOverride': {
+        'uid': 'my-service-worker'
+    },
+    'storageBucket': firebase_bucket
+})
 
 @app.route('/', methods=['POST'])
 def hello():
@@ -18,7 +35,14 @@ def get_images():
     post_data = request.json
     search_name = post_data['search_name']
     max_get_number = post_data['max_get_number']
-    flickr_download.get_images(search_name, max_get_number)
+    training_data.get_images(search_name, max_get_number)
+    return "OK"
+
+@app.route('/delete_images', methods=['POST'])
+def delete_images():
+    post_data = request.json
+    image_name = post_data['image_name']
+    training_data.delete_images(image_name)
     return "OK"
 
 @app.route('/learning', methods=['POST'])
