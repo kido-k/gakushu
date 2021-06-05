@@ -12,56 +12,58 @@
       />
     </div>
 
-    <h2>予測する画像</h2>
-    <div class="setting-group">
-      <v-hover>
-        <template #default="{ hover }">
-          <v-card flat class="predict__image">
-            <div v-if="base64Image">
-              <v-img :src="base64Image" :aspect-ratio="16 / 9" />
-            </div>
-            <div v-else class="no-image">
-              <p class="no-image__text">NO IMAGE</p>
-            </div>
-            <v-fade-transition>
-              <v-overlay v-if="hover" :absolute="true">
-                <v-btn large @click="selectImage"> SELECT IMAGE </v-btn>
-              </v-overlay>
-            </v-fade-transition>
-          </v-card>
-        </template>
-      </v-hover>
-    </div>
+    <template v-if="selectModel">
+      <h2>予測する画像</h2>
+      <div class="setting-group">
+        <v-hover>
+          <template #default="{ hover }">
+            <v-card flat class="predict__image">
+              <div v-if="base64Image">
+                <v-img :src="base64Image" :aspect-ratio="16 / 9" />
+              </div>
+              <div v-else class="no-image">
+                <p class="no-image__text">NO IMAGE</p>
+              </div>
+              <v-fade-transition>
+                <v-overlay v-if="hover" :absolute="true">
+                  <v-btn large @click="selectImage"> SELECT IMAGE </v-btn>
+                </v-overlay>
+              </v-fade-transition>
+            </v-card>
+          </template>
+        </v-hover>
+      </div>
 
-    <input
-      ref="inputImage"
-      style="display: none"
-      type="file"
-      accept="image/jpeg, image/jpg, image/png"
-      @change="selectedFile()"
-    />
-    <v-btn
-      :disabled="!imageFile || !selectModel"
-      large
-      outlined
-      class="predict__button"
-      @click="predictImage"
-    >
-      PREDICT
-    </v-btn>
-    <div class="setting-group mb-10">
-      <p class="predict__result">{{ predictResult }}</p>
-      <v-layout v-if="predict" justify-center>
-        <div v-for="(key, index) in Object.keys(predict)" :key="index">
-          <span
-            v-if="key !== 'result' && key !== 'imageUrl'"
-            class="predict__result__detail"
-          >
-            {{ key }}: {{ predict[key] }}%
-          </span>
-        </div>
-      </v-layout>
-    </div>
+      <input
+        ref="inputImage"
+        style="display: none"
+        type="file"
+        accept="image/jpeg, image/jpg, image/png"
+        @change="selectedFile()"
+      />
+      <v-btn
+        :disabled="!imageFile || !selectModel"
+        large
+        outlined
+        class="predict__button"
+        @click="predictImage"
+      >
+        PREDICT
+      </v-btn>
+      <div v-if="predictResult" class="setting-group mb-10">
+        <p class="predict__result">{{ predictResult }}</p>
+        <v-layout v-if="predict" justify-center>
+          <div v-for="(key, index) in Object.keys(predict)" :key="index">
+            <span
+              v-if="key !== 'result' && key !== 'imageUrl'"
+              class="predict__result__detail"
+            >
+              {{ key }}: {{ predict[key] }}%
+            </span>
+          </div>
+        </v-layout>
+      </div>
+    </template>
   </section>
 </template>
 
@@ -88,7 +90,7 @@ export default {
         learningData = snapshot.val()
       })
       learningData = learningData ? learningData.predict : {}
-      this.updatePredictResult(learningData)
+      if (learningData) this.updatePredictResult(learningData)
       return learningData
     },
   },
