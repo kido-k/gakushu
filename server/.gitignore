@@ -1,6 +1,7 @@
 images
 npy
 model
+sample
 .env
 firebase-adminsdk.json
 __pycache__

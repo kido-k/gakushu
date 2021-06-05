@@ -69,7 +69,7 @@ def get_images(search_name, max_get_number):
         # blob = bucket.blob(storage_path)
         # with open(filepath, 'rb') as f:
         #     blob.upload_from_file(f, content_type=content_type)
-        # time.sleep(wait_time)
+        time.sleep(wait_time)
 
     # localに落とした画像ファイルを削除
     # shutil.rmtree(savedir)
