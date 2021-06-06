@@ -4,4 +4,5 @@ model
 sample
 .env
 firebase-adminsdk.json
+src/.DS_Store
 __pycache__

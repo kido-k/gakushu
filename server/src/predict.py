@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 
 image_size = 50
-my_round_int = lambda x: int((x * 2 + 1) // 2)
+my_round_int = lambda x: int((x * 200 + 1) // 2)
 
 def build_model(file_name, classes):
     model = Sequential()
@@ -59,11 +59,11 @@ def main(predict_image_file, file_name, classes):
 
     result = model.predict([X])[0]
     predicted = result.argmax()
-    percentage = my_round_int(result[predicted] * 100)
+    percentage = my_round_int(result[predicted])
 
     predict_result = {}
     for i, classlabel in enumerate(classes):
-        predict_result[classlabel] = my_round_int(result[i] * 100)
+        predict_result[classlabel] = my_round_int(result[i])
 
     results_ref = db.reference('/results/learning/' + file_name + '/')
     results_ref.child('predict').update({

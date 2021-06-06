@@ -87,7 +87,7 @@ export default {
     return {
       selectModel: null,
       modelData: null,
-      selectModelList: [],
+      selectModelList: ['vgg16'],
       base64Image: null,
       progress: false,
       overlay: false,
@@ -168,10 +168,12 @@ export default {
         .once('value', (snapshot) => {
           this.modelData = snapshot.val()
           this.selectModelList = Object.keys(this.modelData)
+          this.selectModelList.push('vgg16')
         })
     },
     predictImage() {
-      const predictUrl = 'http://localhost:5000/predict'
+      let predictUrl = 'http://localhost:5000/predict'
+      if (this.selectModel === 'vgg16') predictUrl += '/vgg16'
       this.$postApi(
         predictUrl,
         (response) => {

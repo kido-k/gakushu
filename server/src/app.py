@@ -9,6 +9,7 @@ import training_data
 import learning_numpy_data
 import learning_model
 import predict
+import predict_vgg16
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -71,6 +72,13 @@ def predict_image():
     model_name = post_data['model_name']
     classes = post_data['classes']
     result = predict.main(predict_image_file, model_name, classes)
+    return result
+
+@app.route('/predict/vgg16', methods=['POST'])
+def predict_image_vgg16():
+    post_data = request.json
+    predict_image_file = post_data['predict_image_file']
+    result = predict_vgg16.main(predict_image_file, 'vgg16')
     return result
 
 if __name__ == '__main__':
