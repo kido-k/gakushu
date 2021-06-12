@@ -2,7 +2,9 @@ images
 npy
 model
 sample
+temp
 .env
 firebase-adminsdk.json
 src/.DS_Store
 __pycache__
+gcp*.json
