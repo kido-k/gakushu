@@ -10,6 +10,16 @@ import tensorflow as tf
 import numpy as np
 import os, shutil
 
+from google.cloud import storage as gcs
+from google.oauth2 import service_account
+
+project_id = os.getenv('PROJECT_ID')
+key_path = os.getenv('GOOGLE_CREDENTIALS')
+credential = service_account.Credentials.from_service_account_file(key_path)
+client = gcs.Client(project_id, credentials=credential)
+bucket_name = os.getenv('BUCKET_NAME')
+bucket = client.get_bucket(bucket_name)
+
 image_size = 50
 
 def main(file_name, classes):
@@ -31,6 +41,9 @@ def main(file_name, classes):
     results_ref.child(file_name).update({
         'learningStatus': 'finish'
     })
+
+    os.remove('./src/npy/' + file_name + '.npy')
+    os.remove('./src/model/' + file_name + '.h5')
 
 def model_train(file_name, classes, X, y):
     model = Sequential()
@@ -64,8 +77,14 @@ def model_train(file_name, classes, X, y):
     )
 
     model.fit(X, y, batch_size=32, epochs=100)
-
     model.save('./src/model/' + file_name + '.h5')
+
+    # gcsにアップロード
+    storage_file_path = 'model/' + file_name + '.h5'
+    blob_gcs = bucket.blob(storage_file_path)
+    model_file = './src/model/' + file_name + '.h5'
+    blob_gcs.upload_from_filename(model_file)
+
     return model
 
 def model_eval(model, X, y):
@@ -73,10 +92,15 @@ def model_eval(model, X, y):
     print('Test Loss: ', scores[0])
     print('Test Accuracy: ', scores[1])
 
-def delete_learning_model(model_name):
-    delete_dir = './src/model/' + model_name
-    if os.path.exists(delete_dir):
-        shutil.rmtree(delete_dir)
+def delete_learning_model(file_name):
+    storage_file_path = 'model/' + file_name + '.h5'
+    blob_gcs = bucket.blob(storage_file_path)
+    blob_gcs.delete()
+
+    storage_file_path = 'npy/' + file_name + '.npy'
+    blob_gcs = bucket.blob(storage_file_path)
+    blob_gcs.delete()
+
 
 if __name__ == '__main__':
     main()

@@ -15,13 +15,13 @@ load_dotenv()
 # flickr APIの設定
 key = os.getenv('FLICKR_API_KEY')
 secret = os.getenv('FLICKR_SECRET_KEY')
-wait_time = 2
+wait_time = 1.5
 
 project_id = os.getenv('PROJECT_ID')
 key_path = os.getenv('GOOGLE_CREDENTIALS')
 credential = service_account.Credentials.from_service_account_file(key_path)
 client = gcs.Client(project_id, credentials=credential)
-bucket_name = "gakushu-c8c73.appspot.com"
+bucket_name = os.getenv('BUCKET_NAME')
 bucket = client.get_bucket(bucket_name)
 
 def get_images(search_name, max_get_number):
@@ -88,6 +88,7 @@ def get_images(search_name, max_get_number):
 
 
 def delete_images(image_name):
-    delete_dir = "./src/images/" + image_name    
-    if os.path.exists(delete_dir):
-        shutil.rmtree(delete_dir)
+    # delete_dir = "./src/images/" + image_name    
+    # if os.path.exists(delete_dir):
+    #     shutil.rmtree(delete_dir)
+    return

@@ -6,10 +6,20 @@ import firebase_admin
 from firebase_admin import credentials, db, storage
 
 import urllib.request
-import sys, io
+import sys, io, os
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+
+from google.cloud import storage as gcs
+from google.oauth2 import service_account
+
+project_id = os.getenv('PROJECT_ID')
+key_path = os.getenv('GOOGLE_CREDENTIALS')
+credential = service_account.Credentials.from_service_account_file(key_path)
+client = gcs.Client(project_id, credentials=credential)
+bucket_name = os.getenv('BUCKET_NAME')
+bucket = client.get_bucket(bucket_name)
 
 image_size = 50
 my_round_int = lambda x: int((x * 200 + 1) // 2)
@@ -42,6 +52,8 @@ def build_model(file_name, classes):
     model.compile(loss='categorical_crossentropy',optimizer=opt,metrics=['accuracy'])
 
     # モデルのロード
+    blob = bucket.blob('model/' + file_name + '.h5')
+    blob.download_to_filename('./src/model/' + file_name + '.h5')
     model = load_model('./src/model/' + file_name + '.h5')
 
     return model
