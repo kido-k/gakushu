@@ -10,19 +10,9 @@ import tensorflow as tf
 import numpy as np
 import os, shutil
 
-from google.cloud import storage as gcs
-from google.oauth2 import service_account
-
-project_id = os.getenv('PROJECT_ID')
-key_path = os.getenv('GOOGLE_CREDENTIALS')
-credential = service_account.Credentials.from_service_account_file(key_path)
-client = gcs.Client(project_id, credentials=credential)
-bucket_name = os.getenv('BUCKET_NAME')
-bucket = client.get_bucket(bucket_name)
-
 image_size = 50
 
-def main(file_name, classes):
+def main(gcp, file_name, classes):
     # firebaseのステータスを処理中に変更
     results_ref = db.reference('/results/learning/')
     results_ref.child(file_name).update({
@@ -35,7 +25,7 @@ def main(file_name, classes):
     y_train = to_categorical(y_train, len(classes))
     y_test = to_categorical(y_test, len(classes))
 
-    model = model_train(file_name, classes, X_train, y_train)
+    model = model_train(gcp, file_name, classes, X_train, y_train)
     model_eval(model, X_test, y_test)
 
     results_ref.child(file_name).update({
@@ -45,7 +35,7 @@ def main(file_name, classes):
     os.remove('./src/npy/' + file_name + '.npy')
     os.remove('./src/model/' + file_name + '.h5')
 
-def model_train(file_name, classes, X, y):
+def model_train(gcp, file_name, classes, X, y):
     model = Sequential()
     model.add(Conv2D(32, (3, 3), padding='same',input_shape=X.shape[1:]))
     model.add(Activation('relu'))
@@ -81,7 +71,7 @@ def model_train(file_name, classes, X, y):
 
     # gcsにアップロード
     storage_file_path = 'model/' + file_name + '.h5'
-    blob_gcs = bucket.blob(storage_file_path)
+    blob_gcs = gcp['bucket'].blob(storage_file_path)
     model_file = './src/model/' + file_name + '.h5'
     blob_gcs.upload_from_filename(model_file)
 
@@ -92,13 +82,9 @@ def model_eval(model, X, y):
     print('Test Loss: ', scores[0])
     print('Test Accuracy: ', scores[1])
 
-def delete_learning_model(file_name):
+def delete_learning_model(gcp, file_name):
     storage_file_path = 'model/' + file_name + '.h5'
-    blob_gcs = bucket.blob(storage_file_path)
-    blob_gcs.delete()
-
-    storage_file_path = 'npy/' + file_name + '.npy'
-    blob_gcs = bucket.blob(storage_file_path)
+    blob_gcs = gcp['bucket'].blob(storage_file_path)
     blob_gcs.delete()
 
 
